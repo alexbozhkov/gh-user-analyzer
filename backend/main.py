@@ -1,11 +1,10 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Request
 
-from healthcheck import HealthCheckCoordinator
-from healthcheck.example import ExampleHealthChecker
-from models import HealthCheck
+from routers.healthcheck import healthcheck_router
+from routers.users import users_router
 from telemetry.logger import get_logger
 
 logger = get_logger("app")
@@ -20,6 +19,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(title="Fastapi Template Service", version="0.1.0", lifespan=lifespan)
+app.include_router(healthcheck_router)
+app.include_router(users_router)
 
 
 @app.middleware("http")
@@ -37,41 +38,3 @@ async def log_requests(request: Request, call_next):
             f"Response for {request.method} {request.url}: {response.status_code}"
         )
     return response
-
-
-async def get_health_check_coordinator() -> HealthCheckCoordinator:
-    example_health_checker = ExampleHealthChecker()
-    return HealthCheckCoordinator([example_health_checker])
-
-
-@app.get(
-    "/healthz",
-    tags=["healthcheck"],
-    summary="Perform a Health Check",
-    response_description="Return HTTP Status Code 200 (OK)",
-    status_code=status.HTTP_200_OK,
-    response_model=HealthCheck,
-)
-async def health_check(
-    health_check_coordinator: HealthCheckCoordinator = Depends(
-        get_health_check_coordinator
-    ),
-) -> HealthCheck:
-    try:
-        if not await health_check_coordinator.run_health_checks():
-            raise HTTPException(status_code=500)
-        return HealthCheck()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get(
-    "/livez",
-    tags=["healthcheck"],
-    summary="Perform a Live Status Check",
-    response_description="Return HTTP Status Code 200 (OK)",
-    status_code=status.HTTP_200_OK,
-    response_model=HealthCheck,
-)
-async def livez() -> HealthCheck:
-    return HealthCheck()
