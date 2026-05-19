@@ -1,4 +1,4 @@
-class GitHubUser:
+class GitHubUsers:
     def __init__(self, username):
         self.username = username
         self.followers = None
