@@ -35,7 +35,7 @@ jobs:
         env:
           DEPLOY_ENV: testing
 
-  frontend-build:
+  frontend-tests:
     name: Frontend Tests
     runs-on: ubuntu-latest
 
