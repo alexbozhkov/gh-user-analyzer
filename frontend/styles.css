@@ -1,0 +1,12 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 2rem;
+}
+
+input,
+button {
+  font: inherit;
+  margin-right: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
