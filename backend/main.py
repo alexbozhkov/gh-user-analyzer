@@ -3,6 +3,7 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
 
+from routers.graphql import graphql_router
 from routers.healthcheck import healthcheck_router
 from routers.users import users_router
 from telemetry.logger import get_logger
@@ -21,6 +22,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(title="Fastapi Template Service", version="0.1.0", lifespan=lifespan)
 app.include_router(healthcheck_router)
 app.include_router(users_router)
+app.include_router(graphql_router)
 
 
 @app.middleware("http")

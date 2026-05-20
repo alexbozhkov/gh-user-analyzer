@@ -13,34 +13,23 @@ users_router = APIRouter(
 
 @users_router.get("/data")
 async def get_user_data(username: str):
-    """
-    TODO:
-    call the GitHub API and return a dict with data or None
-    """
-    try:
-        return {}
-    except Exception as e:
-        logger.error(f"Error getting data for user {username}: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+    raise HTTPException(
+        status_code=501,
+        detail="REST user summary endpoint foundation is in place but not implemented yet.",
+    )
 
 
 @users_router.get("/repos")
 async def get_user_repos(username: str):
-    """
-    TODO:
-    call the GitHub API and return a list of dicts(repos name, language/technology) with data or None
-    """
-    try:
-        return {}
-    except Exception as e:
-        logger.error(f"Error getting repos for user {username}: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+    raise HTTPException(
+        status_code=501,
+        detail="REST repositories endpoint foundation is in place but not implemented yet.",
+    )
 
 
 @users_router.get("/followers")
 async def get_user_followers(username: str):
-    try:
-        return {}
-    except Exception as e:
-        logger.error(f"Error getting followers for user {username}: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+    raise HTTPException(
+        status_code=501,
+        detail="REST followers endpoint foundation is in place but not implemented yet.",
+    )
