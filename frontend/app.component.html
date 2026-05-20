@@ -1,10 +1,30 @@
 <h1>Github Analyzer</h1>
 
 <input [(ngModel)]="githubUsername" placeholder="GitHub username" />
+<input [(ngModel)]="githubToken" placeholder="GitHub token (required for GraphQL path)" />
 <button type="button" (click)="search()">Search</button>
 
+<p *ngIf="loading">Loading...</p>
 <p *ngIf="error">{{ error }}</p>
 
 <div *ngIf="data">
-    Data loaded.
+    <h2>{{ data.username }}</h2>
+    <p>Followers: {{ data.followersCount }}</p>
+    <p>Most used language: {{ data.mostUsedLanguage || 'No language data' }}</p>
+    <p>Technologies: {{ data.technologies.length ? data.technologies.join(', ') : 'No technologies found' }}</p>
+
+    <div *ngIf="data.messages.length">
+        <p *ngFor="let message of data.messages">{{ message }}</p>
+    </div>
+
+    <h3>Repositories</h3>
+    <ul>
+        <li *ngFor="let repository of data.repositories">
+            <a [href]="repository.url" target="_blank" rel="noreferrer">{{ repository.name }}</a>
+            <span> - {{ repository.primaryLanguage || 'No primary language' }}</span>
+            <span *ngIf="repository.technologies.length">
+                ({{ repository.technologies.join(', ') }})
+            </span>
+        </li>
+    </ul>
 </div>
