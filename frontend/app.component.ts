@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { GithubService, GraphqlUserSummary } from './github.service';
+import { GithubService, GraphqlUserSummary, RestUserSummary } from './github.service';
 
 
 @Component({
@@ -13,38 +13,64 @@ export class AppComponent {
 
     githubUsername = '';
     githubToken = '';
-    data: GraphqlUserSummary | null = null;
-    error = '';
-    loading = false;
+    graphqlData: GraphqlUserSummary | null = null;
+    graphqlError = '';
+    graphqlLoading = false;
+    restData: RestUserSummary | null = null;
+    restError = '';
+    restLoading = false;
 
     constructor(private githubService: GithubService) {}
 
-    search() {
+    searchGraphql() {
         if (!this.githubUsername.trim()) {
-            this.error = 'Please enter a GitHub username.';
-            this.data = null;
+            this.graphqlError = 'Please enter a GitHub username.';
+            this.graphqlData = null;
             return;
         }
 
-        this.loading = true;
-        this.error = '';
-        this.data = null;
+        this.graphqlLoading = true;
+        this.graphqlError = '';
+        this.graphqlData = null;
 
         this.githubService.getUserSummary(this.githubUsername.trim(), this.githubToken).subscribe({
             next: (response) => {
-                this.loading = false;
+                this.graphqlLoading = false;
                 if (response.errors?.length) {
-                    this.error = response.errors.map((error) => error.message).join(', ');
+                    this.graphqlError = response.errors.map((error) => error.message).join(', ');
                     return;
                 }
-                this.data = response.data?.userSummary ?? null;
-                if (!this.data) {
-                    this.error = 'No data was returned from the GraphQL endpoint.';
+                this.graphqlData = response.data?.userSummary ?? null;
+                if (!this.graphqlData) {
+                    this.graphqlError = 'No data was returned from the GraphQL endpoint.';
                 }
             },
             error: (error: HttpErrorResponse) => {
-                this.loading = false;
-                this.error = error.error?.detail ?? 'Request failed.';
+                this.graphqlLoading = false;
+                this.graphqlError = error.error?.detail ?? 'GraphQL request failed.';
+            }
+        });
+    }
+
+    searchRest() {
+        if (!this.githubUsername.trim()) {
+            this.restError = 'Please enter a GitHub username.';
+            this.restData = null;
+            return;
+        }
+
+        this.restLoading = true;
+        this.restError = '';
+        this.restData = null;
+
+        this.githubService.getUserSummaryRest(this.githubUsername.trim(), this.githubToken).subscribe({
+            next: (response) => {
+                this.restLoading = false;
+                this.restData = response;
+            },
+            error: (error: HttpErrorResponse) => {
+                this.restLoading = false;
+                this.restError = error.error?.detail ?? 'REST request failed.';
             }
         });
     }

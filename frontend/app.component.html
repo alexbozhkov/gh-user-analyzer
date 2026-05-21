@@ -2,29 +2,65 @@
 
 <input [(ngModel)]="githubUsername" placeholder="GitHub username" />
 <input [(ngModel)]="githubToken" placeholder="GitHub token (required for GraphQL path)" />
-<button type="button" (click)="search()">Search</button>
 
-<p *ngIf="loading">Loading...</p>
-<p *ngIf="error">{{ error }}</p>
+<section>
+    <h2>GraphQL Solution</h2>
+    <p>Uses your Strawberry GraphQL API backed by the GitHub GraphQL API.</p>
+    <button type="button" (click)="searchGraphql()">Run GraphQL Solution</button>
 
-<div *ngIf="data">
-    <h2>{{ data.username }}</h2>
-    <p>Followers: {{ data.followersCount }}</p>
-    <p>Most used language: {{ data.mostUsedLanguage || 'No language data' }}</p>
-    <p>Technologies: {{ data.technologies.length ? data.technologies.join(', ') : 'No technologies found' }}</p>
+    <p *ngIf="graphqlLoading">Loading...</p>
+    <p *ngIf="graphqlError">{{ graphqlError }}</p>
 
-    <div *ngIf="data.messages.length">
-        <p *ngFor="let message of data.messages">{{ message }}</p>
+    <div *ngIf="graphqlData">
+        <h3>{{ graphqlData.username }}</h3>
+        <p>Followers: {{ graphqlData.followersCount }}</p>
+        <p>Most used language: {{ graphqlData.mostUsedLanguage || 'No language data' }}</p>
+        <p>Technologies: {{ graphqlData.technologies.length ? graphqlData.technologies.join(', ') : 'No technologies found' }}</p>
+
+        <div *ngIf="graphqlData.messages.length">
+            <p *ngFor="let message of graphqlData.messages">{{ message }}</p>
+        </div>
+
+        <h4>Repositories</h4>
+        <ul>
+            <li *ngFor="let repository of graphqlData.repositories">
+                <a [href]="repository.url" target="_blank" rel="noreferrer">{{ repository.name }}</a>
+                <span> - {{ repository.primaryLanguage || 'No primary language' }}</span>
+                <span *ngIf="repository.technologies.length">
+                    ({{ repository.technologies.join(', ') }})
+                </span>
+            </li>
+        </ul>
     </div>
+</section>
 
-    <h3>Repositories</h3>
-    <ul>
-        <li *ngFor="let repository of data.repositories">
-            <a [href]="repository.url" target="_blank" rel="noreferrer">{{ repository.name }}</a>
-            <span> - {{ repository.primaryLanguage || 'No primary language' }}</span>
-            <span *ngIf="repository.technologies.length">
-                ({{ repository.technologies.join(', ') }})
-            </span>
-        </li>
-    </ul>
-</div>
+<section>
+    <h2>REST Solution</h2>
+    <p>Uses your FastAPI REST endpoint backed by the GitHub REST API.</p>
+    <button type="button" (click)="searchRest()">Run REST Solution</button>
+
+    <p *ngIf="restLoading">Loading...</p>
+    <p *ngIf="restError">{{ restError }}</p>
+
+    <div *ngIf="restData">
+        <h3>{{ restData.username }}</h3>
+        <p>Followers: {{ restData.followers_count }}</p>
+        <p>Most used language: {{ restData.most_used_language || 'No language data' }}</p>
+        <p>Technologies: {{ restData.technologies.length ? restData.technologies.join(', ') : 'No technologies found' }}</p>
+
+        <div *ngIf="restData.messages.length">
+            <p *ngFor="let message of restData.messages">{{ message }}</p>
+        </div>
+
+        <h4>Repositories</h4>
+        <ul>
+            <li *ngFor="let repository of restData.repositories">
+                <a [href]="repository.url" target="_blank" rel="noreferrer">{{ repository.name }}</a>
+                <span> - {{ repository.primary_language || 'No primary language' }}</span>
+                <span *ngIf="repository.technologies.length">
+                    ({{ repository.technologies.join(', ') }})
+                </span>
+            </li>
+        </ul>
+    </div>
+</section>

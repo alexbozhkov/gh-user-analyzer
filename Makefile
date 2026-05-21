@@ -9,15 +9,11 @@ ifneq (,$(wildcard .env))
 	export
 endif
 
-.PHONY: all build local-build check-env venv install precommit hooks create-image test trivy help
-
-all: local-build
+.PHONY: all build check-env venv install precommit hooks create-image test trivy help
 
 help:
 	@echo "Available targets:"
-	@echo "  all           - Default target, runs local-build"
-	@echo "  local-build   - Build and start the compose services"
-	@echo "  build         - Setup local tooling (venv, deps, pre-commit, hooks)"
+	@echo "  build         - Setup local tooling (venv, deps, pre-commit, hooks, images) and start the compose services"
 	@echo "  check-env     - No-op placeholder for compatibility"
 	@echo "  venv          - Create Python virtual environment"
 	@echo "  install       - Install Python dependencies"
@@ -31,9 +27,7 @@ help:
 	@echo "  - Python 3.x (for local tooling targets)"
 	@echo "  - Docker with Compose"
 
-build: venv install precommit hooks
-
-local-build: check-env create-image
+build: check-env venv install precommit hooks create-image
 	docker compose up --build
 
 check-env:

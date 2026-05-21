@@ -24,6 +24,22 @@ export interface GraphqlResponse<T> {
 	errors?: Array<{ message: string }>;
 }
 
+export interface RestRepository {
+	name: string;
+	url: string;
+	primary_language: string | null;
+	technologies: string[];
+}
+
+export interface RestUserSummary {
+	username: string;
+	followers_count: number;
+	repositories: RestRepository[];
+	most_used_language: string | null;
+	technologies: string[];
+	messages: string[];
+}
+
 
 @Injectable({
 	providedIn: 'root'
@@ -62,6 +78,17 @@ export class GithubService {
 			},
 			{ headers }
 		);
+	}
+
+	getUserSummaryRest(username: string, token: string): Observable<RestUserSummary> {
+		const headers = token.trim()
+			? new HttpHeaders({ 'X-GitHub-Token': token.trim() })
+			: undefined;
+
+		return this.http.get<RestUserSummary>('/users', {
+			headers,
+			params: { username }
+		});
 	}
 
 }

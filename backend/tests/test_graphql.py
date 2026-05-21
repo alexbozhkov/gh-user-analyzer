@@ -69,3 +69,22 @@ async def test_graphql_user_summary_query(test_client):
             }
         }
     }
+
+
+@pytest.mark.asyncio
+async def test_graphql_user_summary_error_returns_graphql_errors(test_client):
+    with patch(
+        "models.graphql.GitHubUsers.get_user_summary",
+        new=AsyncMock(side_effect=Exception("boom")),
+    ):
+        response = await test_client.post(
+            "/graphql",
+            json={
+                "query": "query($username: String!) { userSummary(username: $username) { username } }",
+                "variables": {"username": "octocat"},
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["data"] is None
+    assert response.json()["errors"] == [{"message": "boom"}]

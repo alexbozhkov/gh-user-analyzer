@@ -12,7 +12,7 @@ describe('AppComponent', () => {
   let githubService: jasmine.SpyObj<GithubService>;
 
   beforeEach(async () => {
-    githubService = jasmine.createSpyObj<GithubService>('GithubService', ['getUserSummary']);
+    githubService = jasmine.createSpyObj<GithubService>('GithubService', ['getUserSummary', 'getUserSummaryRest']);
 
     await TestBed.configureTestingModule({
       declarations: [AppComponent],
@@ -32,10 +32,11 @@ describe('AppComponent', () => {
   });
 
   it('shows a validation error when username is missing', () => {
-    component.search();
+    component.searchGraphql();
     fixture.detectChanges();
 
-    const message = fixture.nativeElement.querySelector('p');
+    const messages = Array.from(fixture.nativeElement.querySelectorAll('p')) as HTMLParagraphElement[];
+    const message = messages.find((paragraph) => paragraph.textContent?.includes('Please enter a GitHub username.'));
 
     expect(message?.textContent).toContain('Please enter a GitHub username.');
   });
@@ -56,10 +57,29 @@ describe('AppComponent', () => {
 
     component.githubUsername = 'octocat';
     component.githubToken = 'token';
-    component.search();
+    component.searchGraphql();
 
     expect(githubService.getUserSummary).toHaveBeenCalledWith('octocat', 'token');
-    expect(component.data?.username).toBe('octocat');
-    expect(component.error).toBe('');
+    expect(component.graphqlData?.username).toBe('octocat');
+    expect(component.graphqlError).toBe('');
+  });
+
+  it('loads REST data after search', () => {
+    githubService.getUserSummaryRest.and.returnValue(of({
+      username: 'octocat',
+      followers_count: 2,
+      most_used_language: 'Python',
+      technologies: ['Docker', 'Python'],
+      messages: [],
+      repositories: [],
+    }));
+
+    component.githubUsername = 'octocat';
+    component.githubToken = 'token';
+    component.searchRest();
+
+    expect(githubService.getUserSummaryRest).toHaveBeenCalledWith('octocat', 'token');
+    expect(component.restData?.username).toBe('octocat');
+    expect(component.restError).toBe('');
   });
 });
