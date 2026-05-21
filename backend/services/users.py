@@ -1,20 +1,23 @@
 from collections import Counter
 
-from data_access.github.repository import GitHubUserRepository
+from data_access.repository.github.graphql import GitHubGraphQLUserRepository
 
 
 class GitHubUsers:
-    def __init__(self, repository: GitHubUserRepository | None = None):
-        self.repository = repository or GitHubUserRepository()
+    def __init__(self, repository=None):
+        self.repository = repository or GitHubGraphQLUserRepository()
 
     async def get_user_summary(
         self,
         username: str,
         token: str | None = None,
     ) -> dict:
-        user = await self.repository.get_user_analysis(username=username, token=token)
-        repositories = user.get("repositories", {}).get("nodes") or []
-        followers_count = user.get("followers", {}).get("totalCount", 0)
+        source = await self.repository.get_user_analysis_source(
+            username=username,
+            token=token,
+        )
+        repositories = source.get("repositories") or []
+        followers_count = source.get("followers_count", 0)
 
         technologies = self._collect_technologies(repositories)
         most_used_language = self._get_most_used_language(repositories)
@@ -26,17 +29,9 @@ class GitHubUsers:
             messages.append("This user does not have repositories.")
 
         return {
-            "username": user["login"],
+            "username": source["username"],
             "followers_count": followers_count,
-            "repositories": [
-                {
-                    "name": repo["name"],
-                    "url": repo["url"],
-                    "primary_language": (repo.get("primaryLanguage") or {}).get("name"),
-                    "technologies": self._extract_repo_languages(repo),
-                }
-                for repo in repositories
-            ],
+            "repositories": repositories,
             "most_used_language": most_used_language,
             "technologies": technologies,
             "messages": messages,
@@ -61,9 +56,4 @@ class GitHubUsers:
         return sorted(technologies)
 
     def _extract_repo_languages(self, repo: dict) -> list[str]:
-        languages = repo.get("languages", {}).get("nodes") or []
-        return [
-            language["name"]
-            for language in languages
-            if language and language.get("name")
-        ]
+        return repo.get("technologies") or []

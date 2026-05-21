@@ -6,6 +6,7 @@ import strawberry
 from strawberry.fastapi import BaseContext
 from strawberry.types import Info
 
+from data_access.repository.github.graphql import GitHubGraphQLUserRepository
 from exceptions import GitHubGraphQLError, UserAnalysisError
 from services.users import GitHubUsers
 
@@ -13,7 +14,7 @@ from services.users import GitHubUsers
 class GraphQLContext(BaseContext):
     def __init__(self, github_token: str | None = None):
         self.github_token = github_token
-        self.user_service = GitHubUsers()
+        self.user_service = GitHubUsers(repository=GitHubGraphQLUserRepository())
 
 
 class GraphQLRequest(BaseModel):
