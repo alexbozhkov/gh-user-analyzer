@@ -1,14 +1,29 @@
 from clients.github.graphql import GitHubGraphQLClient
+from data_access.cache import RedisCacheBackend
+from data_access.cache.keys import build_user_summary_cache_key
 from data_access.repository.queries import USER_ANALYSIS_QUERY
 from exceptions import UserNotFoundError
 
 
 class GitHubGraphQLUserRepository:
+    def __init__(self, cache=None):
+        self.cache = cache or RedisCacheBackend()
+
     async def get_user_analysis_source(
         self,
         username: str,
         token: str | None = None,
     ) -> dict:
+        auth_used = bool(token)
+        cache_key = build_user_summary_cache_key(
+            upstream="graphql",
+            username=username,
+            auth_used=auth_used,
+        )
+        cached = await self.cache.get(cache_key)
+        if cached is not None:
+            return cached["data"]
+
         client = GitHubGraphQLClient(token=token)
         data = await client.execute(USER_ANALYSIS_QUERY, {"login": username})
         user = data.get("user")
@@ -16,7 +31,7 @@ class GitHubGraphQLUserRepository:
             raise UserNotFoundError(f"GitHub user '{username}' does not exist.")
 
         repositories = user.get("repositories", {}).get("nodes") or []
-        return {
+        normalized = {
             "username": user["login"],
             "followers_count": user.get("followers", {}).get("totalCount", 0),
             "repositories": [
@@ -33,3 +48,8 @@ class GitHubGraphQLUserRepository:
                 for repo in repositories
             ],
         }
+        await self.cache.set(
+            cache_key,
+            {"auth_used": auth_used, "data": normalized},
+        )
+        return normalized

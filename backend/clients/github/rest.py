@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 import httpx
@@ -14,7 +13,7 @@ class GitHubRestClient:
     BASE_URL = "https://api.github.com"
 
     def __init__(self, token: str | None = None, timeout: float = 10.0):
-        self.token = token or os.getenv("GITHUB_TOKEN")
+        self.token = token
         self.timeout = timeout
 
     def _build_headers(self) -> dict[str, str]:
