@@ -41,6 +41,15 @@ describe('AppComponent', () => {
     expect(message?.textContent).toContain('Please enter a GitHub username.');
   });
 
+  it('requires a token for the GraphQL solution', () => {
+    component.githubUsername = 'octocat';
+    component.githubToken = '';
+    component.searchGraphql();
+
+    expect(githubService.getUserSummary).not.toHaveBeenCalled();
+    expect(component.graphqlError).toBe('Please enter a GitHub token for the GraphQL solution.');
+  });
+
   it('loads GraphQL data after search', () => {
     githubService.getUserSummary.and.returnValue(of({
       data: {

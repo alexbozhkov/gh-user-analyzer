@@ -26,6 +26,23 @@ async def test_graphql_get_is_not_allowed(test_client):
 
 
 @pytest.mark.asyncio
+async def test_graphql_requires_token(test_client):
+    response = await test_client.post(
+        "/graphql",
+        json={
+            "query": "query($username: String!) { userSummary(username: $username) { username } }",
+            "variables": {"username": "octocat"},
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": None,
+        "errors": [{"message": "X-GitHub-Token is required for the GraphQL endpoint."}],
+    }
+
+
+@pytest.mark.asyncio
 async def test_graphql_user_summary_query(test_client):
     summary = {
         "username": "octocat",
@@ -59,6 +76,7 @@ async def test_graphql_user_summary_query(test_client):
     ):
         response = await test_client.post(
             "/graphql",
+            headers={"X-GitHub-Token": "token"},
             json={
                 "query": "query($username: String!) { userSummary(username: $username) { username followersCount mostUsedLanguage technologies messages cached authUsed rateLimitLimit rateLimitRemaining rateLimitUsed rateLimitReset rateLimitResource repositories { name url primaryLanguage technologies } } }",
                 "variables": {"username": "octocat"},
@@ -102,6 +120,7 @@ async def test_graphql_user_summary_error_returns_graphql_errors(test_client):
     ):
         response = await test_client.post(
             "/graphql",
+            headers={"X-GitHub-Token": "token"},
             json={
                 "query": "query($username: String!) { userSummary(username: $username) { username } }",
                 "variables": {"username": "octocat"},

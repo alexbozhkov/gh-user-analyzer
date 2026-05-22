@@ -29,6 +29,12 @@ export class AppComponent {
             return;
         }
 
+        if (!this.githubToken.trim()) {
+            this.graphqlError = 'Please enter a GitHub token for the GraphQL solution.';
+            this.graphqlData = null;
+            return;
+        }
+
         this.graphqlLoading = true;
         this.graphqlError = '';
         this.graphqlData = null;

@@ -39,6 +39,11 @@ async def execute_graphql(request, payload: GraphQLRequest) -> dict[str, Any]:
     validate_graphql_request(payload.query)
 
     context = await get_graphql_context(request)
+    if not context.github_token:
+        raise GraphQLRequestValidationError(
+            "X-GitHub-Token is required for the GraphQL endpoint."
+        )
+
     result = await strawberry_schema.execute(
         payload.query,
         variable_values=payload.variables,
