@@ -5,14 +5,17 @@ from data_access.cache.keys import build_user_summary_cache_key
 
 
 @pytest.mark.asyncio
-async def test_graphql_health_query(test_client):
+async def test_graphql_health_query_is_rejected(test_client):
     response = await test_client.post(
         "/graphql",
         json={"query": "query { health }"},
     )
 
     assert response.status_code == 200
-    assert response.json() == {"data": {"health": "ok"}}
+    assert response.json() == {
+        "data": None,
+        "errors": [{"message": "Only the userSummary query is allowed."}],
+    }
 
 
 @pytest.mark.asyncio
@@ -38,6 +41,17 @@ async def test_graphql_user_summary_query(test_client):
         "most_used_language": "Python",
         "technologies": ["Docker", "Python"],
         "messages": [],
+        "metadata": {
+            "cached": False,
+            "auth_used": True,
+            "rate_limit": {
+                "limit": 5000,
+                "remaining": 4999,
+                "used": 1,
+                "reset": 1779471697,
+                "resource": "graphql",
+            },
+        },
     }
     with patch(
         "models.graphql.GitHubUsers.get_user_summary",
@@ -46,7 +60,7 @@ async def test_graphql_user_summary_query(test_client):
         response = await test_client.post(
             "/graphql",
             json={
-                "query": "query($username: String!) { userSummary(username: $username) { username followersCount mostUsedLanguage technologies messages repositories { name url primaryLanguage technologies } } }",
+                "query": "query($username: String!) { userSummary(username: $username) { username followersCount mostUsedLanguage technologies messages cached authUsed rateLimitLimit rateLimitRemaining rateLimitUsed rateLimitReset rateLimitResource repositories { name url primaryLanguage technologies } } }",
                 "variables": {"username": "octocat"},
             },
         )
@@ -60,6 +74,13 @@ async def test_graphql_user_summary_query(test_client):
                 "mostUsedLanguage": "Python",
                 "technologies": ["Docker", "Python"],
                 "messages": [],
+                "cached": False,
+                "authUsed": True,
+                "rateLimitLimit": 5000,
+                "rateLimitRemaining": 4999,
+                "rateLimitUsed": 1,
+                "rateLimitReset": 1779471697,
+                "rateLimitResource": "graphql",
                 "repositories": [
                     {
                         "name": "hello-world",
@@ -93,6 +114,22 @@ async def test_graphql_user_summary_error_returns_graphql_errors(test_client):
 
 
 @pytest.mark.asyncio
+async def test_graphql_multiple_operations_are_rejected(test_client):
+    response = await test_client.post(
+        "/graphql",
+        json={
+            "query": 'query A { userSummary(username: "octocat") { username } } query B { userSummary(username: "octocat") { username } }',
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "data": None,
+        "errors": [{"message": "Only a single GraphQL operation is allowed."}],
+    }
+
+
+@pytest.mark.asyncio
 async def test_graphql_repository_uses_cache():
     from data_access.repository.github.graphql import GitHubGraphQLUserRepository
 
@@ -102,6 +139,11 @@ async def test_graphql_repository_uses_cache():
             "username": "octocat",
             "followers_count": 2,
             "repositories": [],
+            "metadata": {
+                "cached": False,
+                "auth_used": True,
+                "rate_limit": None,
+            },
         },
     }
     cache = AsyncMock()
@@ -111,7 +153,8 @@ async def test_graphql_repository_uses_cache():
 
     result = await repository.get_user_analysis_source("octocat", token="token")
 
-    assert result == cached_payload["data"]
+    assert result["username"] == cached_payload["data"]["username"]
+    assert result["metadata"]["cached"] is True
     cache.get.assert_awaited_once_with(
         build_user_summary_cache_key("graphql", "octocat", True)
     )

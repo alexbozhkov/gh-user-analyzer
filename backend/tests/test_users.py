@@ -20,6 +20,17 @@ async def test_users_rest_summary_endpoint(test_client):
         "most_used_language": "Python",
         "technologies": ["Docker", "Python"],
         "messages": [],
+        "metadata": {
+            "cached": False,
+            "auth_used": False,
+            "rate_limit": {
+                "limit": 60,
+                "remaining": 58,
+                "used": 2,
+                "reset": 1779471697,
+                "resource": "core",
+            },
+        },
     }
     with patch(
         "routers.users.users_service.get_user_summary",
@@ -41,6 +52,11 @@ async def test_rest_repository_uses_cache():
             "username": "octocat",
             "followers_count": 2,
             "repositories": [],
+            "metadata": {
+                "cached": False,
+                "auth_used": False,
+                "rate_limit": None,
+            },
         },
     }
     cache = AsyncMock()
@@ -50,7 +66,8 @@ async def test_rest_repository_uses_cache():
 
     result = await repository.get_user_analysis_source("octocat")
 
-    assert result == cached_payload["data"]
+    assert result["username"] == cached_payload["data"]["username"]
+    assert result["metadata"]["cached"] is True
     cache.get.assert_awaited_once_with(
         build_user_summary_cache_key("rest", "octocat", False)
     )
