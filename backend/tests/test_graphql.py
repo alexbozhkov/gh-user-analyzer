@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 
+from data_access.cache.keys import build_user_summary_cache_key
+
 
 @pytest.mark.asyncio
 async def test_graphql_health_query(test_client):
@@ -88,3 +90,29 @@ async def test_graphql_user_summary_error_returns_graphql_errors(test_client):
     assert response.status_code == 200
     assert response.json()["data"] is None
     assert response.json()["errors"] == [{"message": "boom"}]
+
+
+@pytest.mark.asyncio
+async def test_graphql_repository_uses_cache():
+    from data_access.repository.github.graphql import GitHubGraphQLUserRepository
+
+    cached_payload = {
+        "auth_used": True,
+        "data": {
+            "username": "octocat",
+            "followers_count": 2,
+            "repositories": [],
+        },
+    }
+    cache = AsyncMock()
+    cache.get = AsyncMock(return_value=cached_payload)
+    cache.set = AsyncMock()
+    repository = GitHubGraphQLUserRepository(cache=cache)
+
+    result = await repository.get_user_analysis_source("octocat", token="token")
+
+    assert result == cached_payload["data"]
+    cache.get.assert_awaited_once_with(
+        build_user_summary_cache_key("graphql", "octocat", True)
+    )
+    cache.set.assert_not_called()
