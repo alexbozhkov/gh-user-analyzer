@@ -1,12 +1,16 @@
 USER_ANALYSIS_QUERY = """
-query UserAnalysis($login: String!) {
+query UserAnalysis($login: String!, $after: String) {
   user(login: $login) {
     login
     followers {
       totalCount
     }
-    repositories(first: 100, ownerAffiliations: OWNER, isFork: false) {
+    repositories(first: 100, after: $after, ownerAffiliations: OWNER, isFork: false) {
       totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         name
         url

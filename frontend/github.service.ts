@@ -17,6 +17,13 @@ export interface GraphqlUserSummary {
 	mostUsedLanguage: string | null;
 	technologies: string[];
 	messages: string[];
+	cached: boolean;
+	authUsed: boolean;
+	rateLimitLimit: number | null;
+	rateLimitRemaining: number | null;
+	rateLimitUsed: number | null;
+	rateLimitReset: number | null;
+	rateLimitResource: string | null;
 }
 
 export interface GraphqlResponse<T> {
@@ -38,6 +45,17 @@ export interface RestUserSummary {
 	most_used_language: string | null;
 	technologies: string[];
 	messages: string[];
+	metadata?: {
+		cached: boolean;
+		auth_used: boolean;
+		rate_limit?: {
+			limit: number | null;
+			remaining: number | null;
+			used: number | null;
+			reset: number | null;
+			resource: string | null;
+		};
+	};
 }
 
 

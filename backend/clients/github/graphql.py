@@ -53,4 +53,22 @@ class GitHubGraphQLClient:
             )
             raise GitHubResponseError(message)
 
-        return data.get("data", {})
+        return {
+            "data": data.get("data", {}),
+            "rate_limit": {
+                "limit": _to_int(response.headers.get("x-ratelimit-limit")),
+                "remaining": _to_int(response.headers.get("x-ratelimit-remaining")),
+                "used": _to_int(response.headers.get("x-ratelimit-used")),
+                "reset": _to_int(response.headers.get("x-ratelimit-reset")),
+                "resource": response.headers.get("x-ratelimit-resource"),
+            },
+        }
+
+
+def _to_int(value: str | None) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None

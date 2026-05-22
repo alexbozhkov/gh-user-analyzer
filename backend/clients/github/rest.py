@@ -40,4 +40,22 @@ class GitHubRestClient:
                 f"GitHub REST request failed with status {response.status_code}: {response.text}"
             )
 
-        return response.json()
+        return {
+            "data": response.json(),
+            "rate_limit": {
+                "limit": _to_int(response.headers.get("x-ratelimit-limit")),
+                "remaining": _to_int(response.headers.get("x-ratelimit-remaining")),
+                "used": _to_int(response.headers.get("x-ratelimit-used")),
+                "reset": _to_int(response.headers.get("x-ratelimit-reset")),
+                "resource": response.headers.get("x-ratelimit-resource"),
+            },
+        }
+
+
+def _to_int(value: str | None) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None
