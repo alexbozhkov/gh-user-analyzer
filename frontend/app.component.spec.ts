@@ -50,6 +50,13 @@ describe('AppComponent', () => {
           mostUsedLanguage: 'Python',
           technologies: ['Docker', 'Python'],
           messages: [],
+          cached: false,
+          authUsed: true,
+          rateLimitLimit: 5000,
+          rateLimitRemaining: 4999,
+          rateLimitUsed: 1,
+          rateLimitReset: 1779471697,
+          rateLimitResource: 'graphql',
           repositories: [],
         }
       }
@@ -71,6 +78,17 @@ describe('AppComponent', () => {
       most_used_language: 'Python',
       technologies: ['Docker', 'Python'],
       messages: [],
+      metadata: {
+        cached: false,
+        auth_used: false,
+        rate_limit: {
+          limit: 60,
+          remaining: 58,
+          used: 2,
+          reset: 1779471697,
+          resource: 'core',
+        },
+      },
       repositories: [],
     }));
 
