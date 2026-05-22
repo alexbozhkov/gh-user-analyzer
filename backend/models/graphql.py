@@ -39,14 +39,17 @@ class UserSummaryType:
     most_used_language: str | None
     technologies: list[str]
     messages: list[str]
+    cached: bool
+    auth_used: bool
+    rate_limit_limit: int | None
+    rate_limit_remaining: int | None
+    rate_limit_used: int | None
+    rate_limit_reset: int | None
+    rate_limit_resource: str | None
 
 
 @strawberry.type
 class Query:
-    @strawberry.field
-    def health(self) -> str:
-        return "ok"
-
     @strawberry.field
     async def user_summary(
         self,
@@ -62,6 +65,8 @@ class Query:
             raise GraphQLError(str(exc)) from exc
 
         repositories = [RepositoryType(**repo) for repo in summary["repositories"]]
+        metadata = summary.get("metadata", {})
+        rate_limit = metadata.get("rate_limit") or {}
         return UserSummaryType(
             username=summary["username"],
             followers_count=summary["followers_count"],
@@ -69,6 +74,13 @@ class Query:
             most_used_language=summary["most_used_language"],
             technologies=summary["technologies"],
             messages=summary["messages"],
+            cached=metadata.get("cached", False),
+            auth_used=metadata.get("auth_used", False),
+            rate_limit_limit=rate_limit.get("limit"),
+            rate_limit_remaining=rate_limit.get("remaining"),
+            rate_limit_used=rate_limit.get("used"),
+            rate_limit_reset=rate_limit.get("reset"),
+            rate_limit_resource=rate_limit.get("resource"),
         )
 
 

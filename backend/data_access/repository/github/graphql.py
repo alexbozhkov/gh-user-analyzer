@@ -22,15 +22,36 @@ class GitHubGraphQLUserRepository:
         )
         cached = await self.cache.get(cache_key)
         if cached is not None:
-            return cached["data"]
+            cached_data = dict(cached["data"])
+            metadata = dict(cached_data.get("metadata") or {})
+            metadata["cached"] = True
+            cached_data["metadata"] = metadata
+            return cached_data
 
         client = GitHubGraphQLClient(token=token)
-        data = await client.execute(USER_ANALYSIS_QUERY, {"login": username})
-        user = data.get("user")
-        if user is None:
-            raise UserNotFoundError(f"GitHub user '{username}' does not exist.")
+        repositories: list[dict] = []
+        cursor: str | None = None
+        rate_limit: dict | None = None
+        user = None
 
-        repositories = user.get("repositories", {}).get("nodes") or []
+        while True:
+            response = await client.execute(
+                USER_ANALYSIS_QUERY,
+                {"login": username, "after": cursor},
+            )
+            data = response["data"]
+            rate_limit = response.get("rate_limit")
+            user = data.get("user")
+            if user is None:
+                raise UserNotFoundError(f"GitHub user '{username}' does not exist.")
+
+            repository_connection = user.get("repositories", {})
+            repositories.extend(repository_connection.get("nodes") or [])
+            page_info = repository_connection.get("pageInfo") or {}
+            if not page_info.get("hasNextPage"):
+                break
+            cursor = page_info.get("endCursor")
+
         normalized = {
             "username": user["login"],
             "followers_count": user.get("followers", {}).get("totalCount", 0),
@@ -47,6 +68,12 @@ class GitHubGraphQLUserRepository:
                 }
                 for repo in repositories
             ],
+            "metadata": {
+                "cached": False,
+                "auth_used": auth_used,
+                "source": "graphql",
+                "rate_limit": rate_limit,
+            },
         }
         await self.cache.set(
             cache_key,

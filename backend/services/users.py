@@ -35,6 +35,7 @@ class GitHubUsers:
             "most_used_language": most_used_language,
             "technologies": technologies,
             "messages": messages,
+            "metadata": source.get("metadata", {}),
         }
 
     def _get_most_used_language(self, repositories: list[dict]) -> str | None:

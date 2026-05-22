@@ -21,26 +21,36 @@ class GitHubRestUserRepository:
         )
         cached = await self.cache.get(cache_key)
         if cached is not None:
-            return cached["data"]
+            cached_data = dict(cached["data"])
+            metadata = dict(cached_data.get("metadata") or {})
+            metadata["cached"] = True
+            cached_data["metadata"] = metadata
+            return cached_data
 
         client = GitHubRestClient(token=token)
 
         try:
-            user = await client.get(f"/users/{username}")
+            user_response = await client.get(f"/users/{username}")
         except GitHubRestNotFoundError as exc:
             raise UserNotFoundError(
                 f"GitHub user '{username}' does not exist."
             ) from exc
+        user = user_response["data"]
+        rate_limit = user_response.get("rate_limit")
 
-        repos = await client.get(
+        repos_response = await client.get(
             f"/users/{username}/repos",
             params={"per_page": 100, "type": "owner", "sort": "updated"},
         )
+        repos = repos_response["data"]
+        rate_limit = repos_response.get("rate_limit") or rate_limit
 
         repositories = []
         for repo in repos:
             languages_url = repo["languages_url"].replace(client.BASE_URL, "")
-            languages_data = await client.get(languages_url)
+            languages_response = await client.get(languages_url)
+            languages_data = languages_response["data"]
+            rate_limit = languages_response.get("rate_limit") or rate_limit
             repositories.append(
                 {
                     "name": repo["name"],
@@ -54,6 +64,12 @@ class GitHubRestUserRepository:
             "username": user["login"],
             "followers_count": user.get("followers", 0),
             "repositories": repositories,
+            "metadata": {
+                "cached": False,
+                "auth_used": auth_used,
+                "source": "rest",
+                "rate_limit": rate_limit,
+            },
         }
         await self.cache.set(
             cache_key,
