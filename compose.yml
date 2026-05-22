@@ -8,10 +8,13 @@ services:
     environment:
       DEPLOY_ENV: dev
       DEBUG: "True"
+      REDIS_URL: redis://redis:6379/0
     volumes:
       - ./backend:/app
     stdin_open: true
     tty: true
+    depends_on:
+      - redis
 
   frontend:
     container_name: github_analyzer_frontend
@@ -26,3 +29,14 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
+
+  redis:
+    container_name: github_analyzer_redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

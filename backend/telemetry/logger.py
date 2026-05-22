@@ -1,5 +1,6 @@
 import logging
-import os
+
+from config import settings
 
 
 _LOGGER_CONFIGURED = False
@@ -10,7 +11,7 @@ def configure_root_logger() -> None:
     if _LOGGER_CONFIGURED:
         return
 
-    level = os.getenv("LOG_LEVEL", "INFO").upper()
+    level = settings.LOG_LEVEL.upper()
     root = logging.getLogger()
     root.setLevel(level)
 
