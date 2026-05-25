@@ -17,8 +17,9 @@
   <nb-card-body>
     @if (loading) {
       <div class="state-card loading-state">
-        <nb-spinner status="primary"></nb-spinner>
-        <p>Loading analysis...</p>
+        <nb-spinner status="primary">
+          <p>Loading analysis...</p>
+        </nb-spinner>
       </div>
     } @else if (error) {
       <div class="state-card error-state">
