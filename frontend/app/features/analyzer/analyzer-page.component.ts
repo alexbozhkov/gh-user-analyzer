@@ -103,7 +103,7 @@ export class AnalyzerPageComponent {
     this.restError = '';
     this.restData = null;
 
-    this.githubService.getUserSummaryRest(username, this.githubToken).subscribe({
+    this.githubService.getUserSummaryRest(username).subscribe({
       next: (response) => {
         this.restLoading = false;
         this.restData = this.normalizeRestSummary(response);

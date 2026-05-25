@@ -48,12 +48,8 @@ export class GithubService {
     );
   }
 
-  getUserSummaryRest(username: string, token: string): Observable<RestUserSummary> {
-    const trimmedToken = token.trim();
-    const headers = trimmedToken ? new HttpHeaders({ 'X-GitHub-Token': trimmedToken }) : undefined;
-
+  getUserSummaryRest(username: string): Observable<RestUserSummary> {
     return this.http.get<RestUserSummary>(this.restUrl, {
-      headers,
       params: { username },
     });
   }
