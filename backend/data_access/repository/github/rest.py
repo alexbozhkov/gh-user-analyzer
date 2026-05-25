@@ -48,7 +48,7 @@ class GitHubRestUserRepository:
         repositories = []
         for repo in repos:
             languages_url = repo["languages_url"].replace(client.BASE_URL, "")
-            languages_response = await client.get(languages_url)
+            languages_response = await client.get(languages_url, attempts=2)
             languages_data = languages_response["data"]
             rate_limit = languages_response.get("rate_limit") or rate_limit
             repositories.append(

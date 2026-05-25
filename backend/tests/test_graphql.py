@@ -11,11 +11,8 @@ async def test_graphql_health_query_is_rejected(test_client):
         json={"query": "query { health }"},
     )
 
-    assert response.status_code == 200
-    assert response.json() == {
-        "data": None,
-        "errors": [{"message": "Only the userSummary query is allowed."}],
-    }
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Only the userSummary query is allowed."}
 
 
 @pytest.mark.asyncio
@@ -35,10 +32,9 @@ async def test_graphql_requires_token(test_client):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 400
     assert response.json() == {
-        "data": None,
-        "errors": [{"message": "X-GitHub-Token is required for the GraphQL endpoint."}],
+        "detail": "X-GitHub-Token is required for the GraphQL endpoint."
     }
 
 
@@ -127,9 +123,8 @@ async def test_graphql_user_summary_error_returns_graphql_errors(test_client):
             },
         )
 
-    assert response.status_code == 200
-    assert response.json()["data"] is None
-    assert response.json()["errors"] == [{"message": "boom"}]
+    assert response.status_code == 502
+    assert response.json() == {"detail": "boom"}
 
 
 @pytest.mark.asyncio
@@ -141,11 +136,8 @@ async def test_graphql_multiple_operations_are_rejected(test_client):
         },
     )
 
-    assert response.status_code == 200
-    assert response.json() == {
-        "data": None,
-        "errors": [{"message": "Only a single GraphQL operation is allowed."}],
-    }
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Only a single GraphQL operation is allowed."}
 
 
 @pytest.mark.asyncio
