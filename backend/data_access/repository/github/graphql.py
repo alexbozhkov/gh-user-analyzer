@@ -44,7 +44,7 @@ class GitHubGraphQLUserRepository:
                 if "Could not resolve to a User" in str(exc):
                     raise UserNotFoundError(
                         f"GitHub user '{username}' does not exist."
-                    ) from exc
+                    ) from None
                 raise
 
             data = response["data"]

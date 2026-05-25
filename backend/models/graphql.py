@@ -64,7 +64,7 @@ class Query:
         except (GitHubGraphQLError, UserAnalysisError) as exc:
             raise GraphQLError(
                 str(exc), extensions={"type": type(exc).__name__}
-            ) from exc
+            ) from None
 
         repositories = [RepositoryType(**repo) for repo in summary["repositories"]]
         metadata = summary.get("metadata", {})
