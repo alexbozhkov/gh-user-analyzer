@@ -1,0 +1,31 @@
+<nb-layout class="shell-layout">
+  <nb-layout-header fixed class="shell-header">
+    <a routerLink="/" class="brand-mark">GitHub Analyzer</a>
+
+    <nav class="shell-nav" aria-label="Primary">
+      <a
+        nbButton
+        ghost
+        size="small"
+        routerLink="/"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Home
+      </a>
+      <a
+        nbButton
+        size="small"
+        status="primary"
+        routerLink="/analyzer"
+        routerLinkActive="active-link"
+      >
+        Analyzer
+      </a>
+    </nav>
+  </nb-layout-header>
+
+  <nb-layout-column class="shell-column">
+    <router-outlet></router-outlet>
+  </nb-layout-column>
+</nb-layout>

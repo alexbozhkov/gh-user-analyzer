@@ -1,0 +1,22 @@
+@if (repositories.length) {
+  <div class="repository-list">
+    @for (repository of repositories; track repository.url) {
+      <article class="repository-item">
+        <div class="repository-copy">
+          <a [href]="repository.url" target="_blank" rel="noreferrer">{{ repository.name }}</a>
+          <p>{{ repository.primaryLanguage || 'No primary language' }}</p>
+        </div>
+
+        @if (repository.technologies.length) {
+          <div class="technology-tags">
+            @for (technology of repository.technologies; track technology) {
+              <span class="technology-tag">{{ technology }}</span>
+            }
+          </div>
+        }
+      </article>
+    }
+  </div>
+} @else {
+  <p class="empty-copy">No repositories were returned.</p>
+}

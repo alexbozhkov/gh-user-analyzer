@@ -1,0 +1,114 @@
+<nb-card class="result-card" [class.rest-card]="flavor === 'rest'" [class.graphql-card]="flavor === 'graphql'">
+  <nb-card-header>
+    <div class="panel-header">
+      <div>
+        <p class="panel-kicker">{{ flavor === 'rest' ? 'REST result' : 'GraphQL result' }}</p>
+        <h2>{{ title }}</h2>
+        <p class="panel-subtitle">{{ subtitle }}</p>
+      </div>
+
+      <div class="header-pills">
+        <span class="meta-pill">{{ tokenRequirement }}</span>
+        <span class="meta-pill">{{ requestProfile }}</span>
+      </div>
+    </div>
+  </nb-card-header>
+
+  <nb-card-body>
+    @if (loading) {
+      <div class="state-card loading-state">
+        <nb-spinner status="primary">
+          <p>Loading analysis...</p>
+        </nb-spinner>
+      </div>
+    } @else if (error) {
+      <div class="state-card error-state">
+        <p class="state-title">Request failed</p>
+        <p>{{ error }}</p>
+      </div>
+    } @else if (data) {
+      <section class="summary-grid">
+        <article class="summary-tile accent-tile">
+          <span class="tile-label">Username</span>
+          <strong>{{ data.username }}</strong>
+        </article>
+
+        <article class="summary-tile">
+          <span class="tile-label">Followers</span>
+          <strong>{{ data.followersCount }}</strong>
+        </article>
+
+        <article class="summary-tile">
+          <span class="tile-label">Most used language</span>
+          <strong>{{ data.mostUsedLanguage || 'No language data' }}</strong>
+        </article>
+
+        <article class="summary-tile">
+          <span class="tile-label">Repositories</span>
+          <strong>{{ data.repositories.length }}</strong>
+        </article>
+      </section>
+
+      <div class="status-pills">
+        <span class="meta-pill">Cache: {{ data.cached ? 'hit' : 'miss' }}</span>
+        <span class="meta-pill">Auth used: {{ data.authUsed ? 'yes' : 'no' }}</span>
+        @if (data.rateLimit.resource) {
+          <span class="meta-pill">Rate resource: {{ data.rateLimit.resource }}</span>
+        }
+      </div>
+
+      <section class="detail-section">
+        <div class="detail-panel">
+          <h3>Rate-limit snapshot</h3>
+          <p>
+            {{ data.rateLimit.remaining ?? 'n/a' }} remaining / {{ data.rateLimit.limit ?? 'n/a' }} total
+            @if (data.rateLimit.used !== null) {
+              <span>(used: {{ data.rateLimit.used }})</span>
+            }
+          </p>
+          @if (formatResetTimestamp(data.rateLimit.reset); as resetLabel) {
+            <p>Resets: {{ resetLabel }}</p>
+          }
+        </div>
+
+        <div class="detail-panel">
+          <h3>Technologies</h3>
+          @if (data.technologies.length) {
+            <div class="tag-list">
+              @for (technology of data.technologies; track technology) {
+                <span class="tech-tag">{{ technology }}</span>
+              }
+            </div>
+          } @else {
+            <p>No technologies found.</p>
+          }
+        </div>
+      </section>
+
+      @if (data.messages.length) {
+        <section class="message-panel">
+          <h3>Messages</h3>
+          <ul>
+            @for (message of data.messages; track message) {
+              <li>{{ message }}</li>
+            }
+          </ul>
+        </section>
+      }
+
+      <section class="repository-section">
+        <div class="section-heading">
+          <h3>Repositories</h3>
+          <p>Language and technology extraction normalized to the same frontend shape.</p>
+        </div>
+
+        <app-repository-list [repositories]="data.repositories"></app-repository-list>
+      </section>
+    } @else {
+      <div class="state-card empty-state">
+        <p class="state-title">No result yet</p>
+        <p>Run this solution to inspect the normalized GitHub analysis output.</p>
+      </div>
+    }
+  </nb-card-body>
+</nb-card>

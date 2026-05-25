@@ -1,0 +1,185 @@
+.result-card {
+  min-height: 100%;
+  border: 1px solid rgba(171, 147, 255, 0.18);
+  background: rgba(16, 10, 39, 0.84);
+}
+
+.rest-card {
+  box-shadow: 0 22px 52px rgba(55, 110, 255, 0.14);
+}
+
+.graphql-card {
+  box-shadow: 0 24px 56px rgba(255, 59, 183, 0.16);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panel-kicker {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rest-card .panel-kicker {
+  color: #7fc6ff;
+}
+
+.graphql-card .panel-kicker {
+  color: #ff8fe8;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.panel-subtitle {
+  margin: 0.45rem 0 0;
+  color: rgba(214, 203, 255, 0.76);
+  line-height: 1.55;
+}
+
+.header-pills,
+.status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.header-pills {
+  justify-content: flex-end;
+  align-self: flex-start;
+}
+
+.meta-pill,
+.tech-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(244, 241, 255, 0.94);
+  font-size: 0.82rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem;
+}
+
+.summary-tile {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.accent-tile {
+  background: linear-gradient(135deg, rgba(255, 70, 197, 0.16), rgba(86, 59, 255, 0.16));
+}
+
+.tile-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: rgba(212, 201, 255, 0.72);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.detail-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.95rem;
+  margin-top: 1rem;
+}
+
+.detail-panel,
+.message-panel,
+.repository-section,
+.state-card {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-panel h3,
+.message-panel h3,
+.repository-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.message-panel ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.message-panel li + li {
+  margin-top: 0.45rem;
+}
+
+.section-heading {
+  margin-bottom: 0.9rem;
+}
+
+.section-heading p,
+.detail-panel p,
+.state-card p {
+  color: rgba(221, 213, 255, 0.8);
+  line-height: 1.6;
+}
+
+.loading-state,
+.empty-state,
+.error-state {
+  display: grid;
+  place-items: center;
+  gap: 0.8rem;
+  min-height: 15rem;
+  text-align: center;
+}
+
+.error-state {
+  border-color: rgba(255, 94, 161, 0.25);
+}
+
+.state-title {
+  margin: 0;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .panel-header,
+  .detail-section,
+  .summary-grid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .panel-header {
+    gap: 0.9rem;
+  }
+
+  .header-pills {
+    justify-content: flex-start;
+  }
+}

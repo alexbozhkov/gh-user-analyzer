@@ -1,0 +1,60 @@
+<section class="page-intro">
+  <div>
+    <p class="eyebrow">Analyzer</p>
+    <h1>Run the same GitHub summary through two API styles.</h1>
+    <p>
+      Use the shared input form below, then compare cache hits, auth usage, rate limits, repository details,
+      and request shape side by side.
+    </p>
+  </div>
+</section>
+
+<app-search-form
+  [username]="githubUsername"
+  [token]="githubToken"
+  [tokenRequired]="graphqlTokenRequired"
+  (usernameChange)="updateUsername($event)"
+  (tokenChange)="updateToken($event)"
+  (searchRest)="searchRest()"
+  (searchGraphql)="searchGraphql()"
+></app-search-form>
+
+<section class="comparison-strip" aria-label="Comparison highlights">
+  <nb-card class="comparison-card rest-card">
+    <nb-card-body>
+      <span class="comparison-label">REST</span>
+      <strong>GitHub REST upstream with optional token and more granular request fan-out.</strong>
+    </nb-card-body>
+  </nb-card>
+
+  <nb-card class="comparison-card graphql-card">
+    <nb-card-body>
+      <span class="comparison-label">GraphQL</span>
+      <strong>Token-required Strawberry endpoint with a single shaped upstream query and pagination.</strong>
+    </nb-card-body>
+  </nb-card>
+</section>
+
+<section class="results-grid">
+  <app-result-panel
+    title="REST Solution"
+    subtitle="FastAPI REST endpoint backed by GitHub REST"
+    flavor="rest"
+    tokenRequirement="Token optional"
+    requestProfile="1 + 1 + N upstream requests"
+    [loading]="restLoading"
+    [error]="restError"
+    [data]="restData"
+  />
+
+  <app-result-panel
+    title="GraphQL Solution"
+    subtitle="Strawberry GraphQL endpoint backed by GitHub GraphQL"
+    flavor="graphql"
+    tokenRequirement="Token required"
+    requestProfile="Single shaped query with pagination"
+    [loading]="graphqlLoading"
+    [error]="graphqlError"
+    [data]="graphqlData"
+  />
+</section>
