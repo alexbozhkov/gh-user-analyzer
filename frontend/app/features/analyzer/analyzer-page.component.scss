@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.page-intro {
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: #ff8fe8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3.7vw, 3.2rem);
+  line-height: 1;
+}
+
+.page-intro p:last-child {
+  max-width: 46rem;
+  color: rgba(230, 223, 255, 0.82);
+  line-height: 1.7;
+}
+
+.comparison-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.comparison-card {
+  border: 1px solid rgba(165, 142, 255, 0.16);
+  background: rgba(17, 11, 39, 0.78);
+}
+
+.comparison-label {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rest-card .comparison-label {
+  color: #7dc2ff;
+}
+
+.graphql-card .comparison-label {
+  color: #ff8ee4;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 980px) {
+  .comparison-strip,
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}

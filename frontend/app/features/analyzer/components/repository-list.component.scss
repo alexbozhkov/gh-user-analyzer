@@ -1,0 +1,47 @@
+.repository-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.repository-item {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.95rem;
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.repository-copy a {
+  color: #8cd5ff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.repository-copy a:hover {
+  text-decoration: underline;
+}
+
+.repository-copy p {
+  margin: 0.35rem 0 0;
+  color: rgba(214, 204, 255, 0.76);
+}
+
+.technology-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.technology-tag {
+  display: inline-flex;
+  padding: 0.34rem 0.72rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4f1ff;
+  font-size: 0.8rem;
+}
+
+.empty-copy {
+  color: rgba(216, 206, 255, 0.72);
+}

@@ -1,0 +1,55 @@
+<section class="hero-section">
+  <div class="hero-copy">
+    <p class="eyebrow">Angular 21 + Nebular Cosmic</p>
+    <h1>Compare REST and GraphQL with a frontend that looks intentional.</h1>
+    <p class="hero-text">
+      This app runs the same GitHub user analysis through two API shapes, then highlights cache hits,
+      authentication usage, rate-limit metadata, and repository insights in one polished workflow.
+    </p>
+
+    <div class="hero-actions">
+      <a nbButton status="primary" size="large" routerLink="/analyzer">Open Analyzer</a>
+      <p class="helper-copy">The analyzer opens with an empty form so you can try any GitHub account.</p>
+    </div>
+  </div>
+
+  <div class="hero-orbit hero-orbit-one"></div>
+  <div class="hero-orbit hero-orbit-two"></div>
+</section>
+
+<section class="feature-grid">
+  <nb-card class="feature-card rest-card">
+    <nb-card-header>REST Path</nb-card-header>
+    <nb-card-body>
+      <p>Backed by your FastAPI REST endpoint and GitHub REST upstream calls.</p>
+      <ul>
+        <li>Token is optional</li>
+        <li>Great for assignment-style REST output</li>
+        <li>More upstream requests when repository language details are expanded</li>
+      </ul>
+    </nb-card-body>
+  </nb-card>
+
+  <nb-card class="feature-card graphql-card">
+    <nb-card-header>GraphQL Path</nb-card-header>
+    <nb-card-body>
+      <p>Backed by your Strawberry API and GitHub GraphQL pagination.</p>
+      <ul>
+        <li>GitHub token is required</li>
+        <li>Single shaped query with pagination support</li>
+        <li>Ideal for comparing rate-limit efficiency against REST</li>
+      </ul>
+    </nb-card-body>
+  </nb-card>
+</section>
+
+<section class="insight-strip">
+  <div class="insight-panel">
+    <span class="insight-label">Compare</span>
+    <strong>Cache hits, token usage, and rate-limit pressure side by side.</strong>
+  </div>
+  <div class="insight-panel">
+    <span class="insight-label">Present</span>
+    <strong>A cleaner Angular structure with routed pages and reusable UI pieces.</strong>
+  </div>
+</section>

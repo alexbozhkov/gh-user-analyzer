@@ -1,0 +1,41 @@
+<nb-card class="search-card">
+  <nb-card-header>Run both solutions from one place</nb-card-header>
+  <nb-card-body>
+    <div class="field-grid">
+      <label class="field">
+        <span>GitHub username</span>
+        <input
+          nbInput
+          fullWidth
+          name="githubUsername"
+          placeholder="octocat"
+          [ngModel]="username"
+          (ngModelChange)="usernameChange.emit($event)"
+        />
+      </label>
+
+      <label class="field">
+        <span>GitHub token</span>
+        <input
+          nbInput
+          fullWidth
+          type="password"
+          name="githubToken"
+          placeholder="Required for GraphQL"
+          [ngModel]="token"
+          (ngModelChange)="tokenChange.emit($event)"
+        />
+      </label>
+    </div>
+
+    <div class="button-row">
+      <button nbButton status="info" type="button" (click)="searchRest.emit()">Run REST Solution</button>
+      <button nbButton status="primary" type="button" (click)="searchGraphql.emit()">Run GraphQL Solution</button>
+    </div>
+
+    <p class="helper-text">
+      REST can use anonymous GitHub requests. GraphQL requires your backend endpoint to receive
+      <code>X-GitHub-Token</code>.
+    </p>
+  </nb-card-body>
+</nb-card>
