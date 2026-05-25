@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NbThemeModule } from '@nebular/theme';
 
@@ -106,8 +107,120 @@ describe('AnalyzerPageComponent', () => {
     component.searchRest();
     fixture.detectChanges();
 
-    expect(githubService.getUserSummaryRest).toHaveBeenCalledWith('octocat', 'token');
+    expect(githubService.getUserSummaryRest).toHaveBeenCalledWith('octocat');
     expect(component.restData?.username).toBe('octocat');
     expect(fixture.nativeElement.textContent).toContain('58 remaining / 60 total');
+  });
+
+  it('shows a validation error when username is missing for REST', () => {
+    component.searchRest();
+    fixture.detectChanges();
+
+    expect(component.restError).toBe('Please enter a GitHub username.');
+    expect(githubService.getUserSummaryRest).not.toHaveBeenCalled();
+  });
+
+  it('handles REST HTTP error', () => {
+    githubService.getUserSummaryRest.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            error: { detail: 'REST API error' },
+            status: 404,
+          }),
+      ),
+    );
+
+    component.githubUsername = 'octocat';
+    component.searchRest();
+    fixture.detectChanges();
+
+    expect(component.restError).toBe('REST API error');
+  });
+
+  it('handles REST HTTP error with no detail', () => {
+    githubService.getUserSummaryRest.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 500,
+          }),
+      ),
+    );
+
+    component.githubUsername = 'octocat';
+    component.searchRest();
+    fixture.detectChanges();
+
+    expect(component.restError).toBe('REST request failed.');
+  });
+
+  it('handles GraphQL response with errors', () => {
+    githubService.getUserSummary.and.returnValue(
+      of({
+        errors: [{ message: 'GitHub user does not exist.' }],
+      } as any),
+    );
+
+    component.githubUsername = 'octocat';
+    component.githubToken = 'token';
+    component.searchGraphql();
+    fixture.detectChanges();
+
+    expect(component.graphqlError).toBe('GitHub user does not exist.');
+    expect(component.graphqlData).toBeNull();
+  });
+
+  it('handles GraphQL HTTP error', () => {
+    githubService.getUserSummary.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            error: { detail: 'Internal server error' },
+            status: 500,
+          }),
+      ),
+    );
+
+    component.githubUsername = 'octocat';
+    component.githubToken = 'token';
+    component.searchGraphql();
+    fixture.detectChanges();
+
+    expect(component.graphqlError).toBe('Internal server error');
+  });
+
+  it('handles GraphQL returning null data', () => {
+    githubService.getUserSummary.and.returnValue(
+      of({
+        data: { userSummary: null },
+      } as any),
+    );
+
+    component.githubUsername = 'octocat';
+    component.githubToken = 'token';
+    component.searchGraphql();
+    fixture.detectChanges();
+
+    expect(component.graphqlError).toBe('No data was returned from the GraphQL endpoint.');
+    expect(component.graphqlData).toBeNull();
+  });
+
+  it('updates username via updateUsername', () => {
+    component.updateUsername('newuser');
+    expect(component.githubUsername).toBe('newuser');
+  });
+
+  it('updates token via updateToken and clears tokenRequired flag', () => {
+    component.graphqlTokenRequired = true;
+    component.updateToken('newtoken');
+    expect(component.githubToken).toBe('newtoken');
+    expect(component.graphqlTokenRequired).toBe(false);
+  });
+
+  it('does not clear graphqlTokenRequired when token is blank', () => {
+    component.graphqlTokenRequired = true;
+    component.updateToken('   ');
+    expect(component.graphqlTokenRequired).toBe(true);
   });
 });
