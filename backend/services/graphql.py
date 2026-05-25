@@ -53,5 +53,8 @@ async def execute_graphql(request, payload: GraphQLRequest) -> dict[str, Any]:
 
     response: dict[str, Any] = {"data": result.data}
     if result.errors:
-        response["errors"] = [{"message": error.message} for error in result.errors]
+        response["errors"] = [
+            {"message": error.message, "extensions": error.extensions or {}}
+            for error in result.errors
+        ]
     return response

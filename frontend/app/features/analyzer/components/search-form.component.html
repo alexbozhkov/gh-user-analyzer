@@ -15,13 +15,19 @@
       </label>
 
       <label class="field">
-        <span>GitHub token</span>
+        <span>
+          GitHub token
+          @if (tokenRequired) {
+            <span class="required-hint">required</span>
+          }
+        </span>
         <input
           nbInput
           fullWidth
           type="password"
           name="githubToken"
           placeholder="Required for GraphQL"
+          [status]="tokenRequired ? 'danger' : 'basic'"
           [ngModel]="token"
           (ngModelChange)="tokenChange.emit($event)"
         />

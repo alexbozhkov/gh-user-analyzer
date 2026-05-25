@@ -2,7 +2,7 @@ from clients.github.graphql import GitHubGraphQLClient
 from data_access.cache import RedisCacheBackend
 from data_access.cache.keys import build_user_summary_cache_key
 from data_access.repository.queries import USER_ANALYSIS_QUERY
-from exceptions import UserNotFoundError
+from exceptions import GitHubResponseError, UserNotFoundError
 
 
 class GitHubGraphQLUserRepository:
@@ -35,10 +35,18 @@ class GitHubGraphQLUserRepository:
         user = None
 
         while True:
-            response = await client.execute(
-                USER_ANALYSIS_QUERY,
-                {"login": username, "after": cursor},
-            )
+            try:
+                response = await client.execute(
+                    USER_ANALYSIS_QUERY,
+                    {"login": username, "after": cursor},
+                )
+            except GitHubResponseError as exc:
+                if "Could not resolve to a User" in str(exc):
+                    raise UserNotFoundError(
+                        f"GitHub user '{username}' does not exist."
+                    ) from exc
+                raise
+
             data = response["data"]
             rate_limit = response.get("rate_limit")
             user = data.get("user")

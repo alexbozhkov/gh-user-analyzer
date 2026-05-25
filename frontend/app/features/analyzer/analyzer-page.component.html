@@ -12,6 +12,7 @@
 <app-search-form
   [username]="githubUsername"
   [token]="githubToken"
+  [tokenRequired]="graphqlTokenRequired"
   (usernameChange)="updateUsername($event)"
   (tokenChange)="updateToken($event)"
   (searchRest)="searchRest()"

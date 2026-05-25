@@ -13,6 +13,7 @@ import { NbButtonModule, NbCardModule, NbInputModule } from '@nebular/theme';
 export class SearchFormComponent {
   @Input() username = '';
   @Input() token = '';
+  @Input() tokenRequired = false;
 
   @Output() readonly usernameChange = new EventEmitter<string>();
   @Output() readonly tokenChange = new EventEmitter<string>();

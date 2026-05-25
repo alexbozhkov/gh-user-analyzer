@@ -24,6 +24,7 @@ import { ResultPanelComponent } from './components/result-panel.component';
 export class AnalyzerPageComponent {
   githubUsername = '';
   githubToken = '';
+  graphqlTokenRequired = false;
   graphqlData: AnalysisResultViewModel | null = null;
   graphqlError = '';
   graphqlLoading = false;
@@ -42,6 +43,9 @@ export class AnalyzerPageComponent {
 
   updateToken(value: string): void {
     this.githubToken = value;
+    if (value.trim()) {
+      this.graphqlTokenRequired = false;
+    }
   }
 
   searchGraphql(): void {
@@ -55,6 +59,7 @@ export class AnalyzerPageComponent {
 
     if (!this.githubToken.trim()) {
       this.graphqlError = 'Please enter a GitHub token for the GraphQL solution.';
+      this.graphqlTokenRequired = true;
       this.graphqlData = null;
       return;
     }

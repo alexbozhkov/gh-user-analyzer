@@ -23,6 +23,14 @@
   font-weight: 600;
 }
 
+.required-hint {
+  color: #ff3d71;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-left: 0.35rem;
+}
+
 .button-row {
   display: flex;
   flex-wrap: wrap;
