@@ -21,7 +21,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [],
             "styles": [
-              "styles.css"
+              "node_modules/@nebular/theme/styles/prebuilt/cosmic.css",
+              "styles.scss"
             ]
           },
           "configurations": {
@@ -61,11 +62,15 @@
             "karmaConfig": "karma.conf.js",
             "assets": [],
             "styles": [
-              "styles.css"
+              "node_modules/@nebular/theme/styles/prebuilt/cosmic.css",
+              "styles.scss"
             ]
           }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

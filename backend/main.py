@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
 from routers.graphql import graphql_router
 from routers.healthcheck import healthcheck_router
@@ -32,11 +33,13 @@ async def log_requests(request: Request, call_next):
         logger.info(f"Request: {request.method} {request.url}")
     try:
         response = await call_next(request)
-    except Exception as e:
-        logger.error(f"Request failed: {e}", exc_info=True)
-        raise
-    if should_log and response.status_code != 200:
-        logger.info(
+    except Exception:
+        logger.exception("Unhandled exception")
+        return JSONResponse(
+            status_code=500, content={"detail": "Internal server error"}
+        )
+    if should_log and response.status_code >= 400:
+        logger.warning(
             f"Response for {request.method} {request.url}: {response.status_code}"
         )
     return response

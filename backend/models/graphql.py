@@ -62,7 +62,9 @@ class Query:
                 token=info.context.github_token,
             )
         except (GitHubGraphQLError, UserAnalysisError) as exc:
-            raise GraphQLError(str(exc)) from exc
+            raise GraphQLError(
+                str(exc), extensions={"type": type(exc).__name__}
+            ) from None
 
         repositories = [RepositoryType(**repo) for repo in summary["repositories"]]
         metadata = summary.get("metadata", {})

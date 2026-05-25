@@ -1,9 +1,18 @@
 import logging
+import sys
 
 from config import settings
 
 
 _LOGGER_CONFIGURED = False
+
+_SILENT_LOGGERS = [
+    "graphql",
+    "strawberry",
+    "httpx",
+    "httpcore",
+    "tenacity",
+]
 
 
 def configure_root_logger() -> None:
@@ -17,8 +26,13 @@ def configure_root_logger() -> None:
 
     root.handlers.clear()
 
-    handler = logging.StreamHandler()
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter("%(message)s"))
     root.addHandler(handler)
+
+    for name in _SILENT_LOGGERS:
+        logging.getLogger(name).setLevel(logging.CRITICAL + 1)
+        logging.getLogger(name).propagate = False
 
     _LOGGER_CONFIGURED = True
 

@@ -39,6 +39,11 @@ async def execute_graphql(request, payload: GraphQLRequest) -> dict[str, Any]:
     validate_graphql_request(payload.query)
 
     context = await get_graphql_context(request)
+    if not context.github_token:
+        raise GraphQLRequestValidationError(
+            "X-GitHub-Token is required for the GraphQL endpoint."
+        )
+
     result = await strawberry_schema.execute(
         payload.query,
         variable_values=payload.variables,
@@ -48,5 +53,8 @@ async def execute_graphql(request, payload: GraphQLRequest) -> dict[str, Any]:
 
     response: dict[str, Any] = {"data": result.data}
     if result.errors:
-        response["errors"] = [{"message": error.message} for error in result.errors]
+        response["errors"] = [
+            {"message": error.message, "extensions": error.extensions or {}}
+            for error in result.errors
+        ]
     return response

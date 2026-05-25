@@ -5,7 +5,7 @@ query UserAnalysis($login: String!, $after: String) {
     followers {
       totalCount
     }
-    repositories(first: 100, after: $after, ownerAffiliations: OWNER, isFork: false) {
+    repositories(first: 100, after: $after, ownerAffiliations: OWNER) {
       totalCount
       pageInfo {
         hasNextPage
